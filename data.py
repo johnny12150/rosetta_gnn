@@ -84,7 +84,6 @@ class NNDataLoader():
 
 
 class NNDataGenerator():
-    # fixme 結合 SR-GNN的前處理
     """Construct dataset for NN"""
     def __init__(self, config, load=False, save=True):
         """
@@ -92,8 +91,6 @@ class NNDataGenerator():
             target_action: the target action at the next timestep. Can be 'buy', 'select', 'click', 'view'
             monitor_actions: the action that we should keep track with
         """
-
-        # todo 如果是 load以前處理好的資料, 把 tmp資料夾下的全部合成 1份
 
         self.config = config
 
@@ -198,7 +195,6 @@ class NNDataGenerator():
 
             unique_items = OrderedSet(all_items)
             unique_actions = OrderedSet(data.action.values)
-            # todo 存 all_items
 
             del all_items
 
@@ -650,9 +646,6 @@ class NNDataGenerator():
             print(f"Number of training data: {self.train_data.shape}")
             print(f"Number of validation data: {self.val_data.shape}")
             print(f"Number of test data: {self.test_data.shape}")
-
-        # todo 塞進SR-GNN的前處理
-        # 1. 根據session id 去取click_out seq (past_interactions)
 
     
     def get_features(self):

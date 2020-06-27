@@ -159,6 +159,7 @@ n_iter = 0
 stopped = False
 val_losses = []
 tr_losses = []
+
 for i in range(configuration.num_epochs+1):
     total_loss = 0
     net.train()

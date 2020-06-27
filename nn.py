@@ -96,12 +96,6 @@ class Net(torch.nn.Module):
         # emb_past_interactions = emb_past_interactions.permute(0,2,1)  # (1024, 10, 128) to (1024, 128, 10)
         # pooled_interaction = F.max_pool1d(emb_past_interactions, kernel_size=self.config.sequence_length).squeeze(2)  # (1024, 128)
 
-        # fixme 改成用 index取 而非 slice
-        # for i, j in zip(slices, np.arange(len(slices))):
-            # model.optimizer.zero_grad()
-            # 這裡替換成 SR-GNN的 session emb
-            # _, pooled_interaction = forward(self.srgnn, i, data)
-
         _, pooled_interaction = forward(self.srgnn, slices, data, self.emb_dict['item_id'])
 
         # concatenate sequence of item ids and actions to model session dynamics
