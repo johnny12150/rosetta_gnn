@@ -1,5 +1,5 @@
-# input_dir = './datasets/trivago_imp'
-input_dir = './datasets/trivago_sample'
+input_dir = './datasets/trivago_imp'  # 25 % data
+# input_dir = './datasets/trivago_sample'  # 10% data
 output_dir = './output'
 weights_dir = './weights'
 

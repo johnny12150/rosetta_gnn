@@ -11,7 +11,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='trivago_imp', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample/trivago_imp')
-parser.add_argument('--batchSize', type=int, default=256, help='input batch size')
+parser.add_argument('--batchSize', type=int, default=1024, help='input batch size')
 parser.add_argument('--hiddenSize', type=int, default=128, help='hidden state size')
 parser.add_argument('--epoch', type=int, default=30, help='the number of epochs to train for')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')  # [0.001, 0.0005, 0.0001]
@@ -71,7 +71,6 @@ class Net(torch.nn.Module):
         user_embeddings = []
         batch_size = item_id.size(0)
 
-        # todo 讓 SR-GNN也共用 item embedding
         # embedding of all categorical features
         emb_item = self.emb_dict['item_id'](item_id)
         emb_past_interactions = self.emb_dict['item_id'](past_interactions)
@@ -96,10 +95,12 @@ class Net(torch.nn.Module):
         # emb_past_interactions = emb_past_interactions.permute(0,2,1)  # (1024, 10, 128) to (1024, 128, 10)
         # pooled_interaction = F.max_pool1d(emb_past_interactions, kernel_size=self.config.sequence_length).squeeze(2)  # (1024, 128)
 
+        # todo 目前 data是僅限 click_out item, 可以嘗試用完整seq
         _, pooled_interaction = forward(self.srgnn, slices, data, self.emb_dict['item_id'])
 
         # concatenate sequence of item ids and actions to model session dynamics
         emb_past_interactions_sess = torch.cat([emb_past_interactions_sess, emb_past_actions_sess], dim=2)
+        # todo 考慮將 gru以 SR-GNN取代之
         emb_past_interactions_sess, _ = self.gru_sess(emb_past_interactions_sess)
         emb_past_interactions_sess = emb_past_interactions_sess.permute(0, 2, 1)
         pooled_interaction_sess = F.max_pool1d(emb_past_interactions_sess, kernel_size=self.config.sess_length).squeeze(2)
@@ -109,9 +110,6 @@ class Net(torch.nn.Module):
         item_interaction = emb_item * pooled_interaction
         item_last_item = emb_item * emb_last_item
         item_last_click_item = emb_item * emb_last_click_item
-        # item_interaction = torch.mm(emb_item, pooled_interaction.T)
-        # item_last_item = torch.mm(emb_item, emb_last_item.T)
-        # item_last_click_item = torch.mm(emb_item, emb_last_click_item.T)
         imp_last_idx = emb_impression_index * emb_last_interact_index
 
         # efficiently compute the aggregation of feature interactions 
@@ -249,7 +247,7 @@ def forward(model, i, data, item_emb):
     # A = trans_to_cpu(torch.Tensor(A).float())
     # mask = trans_to_cpu(torch.Tensor(mask).long())
 
-    # todo 這裡的 items先過 embedding
+    # 這裡的 items先過 embedding
     items = item_emb(items)
     hidden = model(items, A)  # run model.forward()
     get = lambda i: hidden[i][alias_inputs[i]]

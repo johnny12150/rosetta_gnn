@@ -9,7 +9,7 @@ class Configuration(object):
     def __init__(self):
         self.alias = None
         self.num_epochs = 1
-        self.batch_size = 256
+        self.batch_size = 1024
         self.optimizer = 'adam'
         self.use_cuda = True
         # self.use_cuda = False

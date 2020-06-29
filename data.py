@@ -766,7 +766,7 @@ class NNDataGenerator():
             else:
                 padded_transformed_impressions = transformed_impressions.copy()
             # padded_transformed_impressions = np.array([transformed_impressions[0]] * 2 + transformed_impressions.tolist() + [transformed_impressions[-1]] * 2)
-            padded_prices =  [ row.prices[0]] * 2 +  row.prices + [row.prices[-1]]*2
+            padded_prices = [row.prices[0]] * 2 + row.prices + [row.prices[-1]]*2
             price_rank = compute_rank(row.prices)
             current_rows = np.zeros([len(row.impressions), 41], dtype=object)
             current_rows[:, 0] = row.user_id
